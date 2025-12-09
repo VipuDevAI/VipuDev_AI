@@ -8,12 +8,14 @@ import {
   Rocket, 
   Palette, 
   Settings,
-  LogOut
+  LogOut,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/builder", icon: Zap, label: "App Builder", highlight: true },
   { href: "/editor", icon: Code2, label: "AI Coding" },
   { href: "/chat", icon: MessageSquare, label: "Chat" },
   { href: "/docker", icon: Container, label: "Code Runner" },
@@ -49,17 +51,22 @@ export function Sidebar({ onLogout }: SidebarProps) {
       <nav className="flex flex-col gap-1">
         {navItems.map((item) => {
           const isActive = location === item.href;
+          const isHighlight = 'highlight' in item && item.highlight;
           return (
             <Link key={item.href} href={item.href}>
               <div className={cn(
                 "sidebar-btn group",
-                isActive && "active"
+                isActive && "active",
+                isHighlight && !isActive && "border border-lime-500/30 bg-lime-500/10"
               )}>
                 <item.icon className={cn(
                   "w-5 h-5 transition-colors",
-                  isActive ? "text-white" : "text-gray-400 group-hover:text-lime-400"
+                  isActive ? "text-white" : isHighlight ? "text-yellow-400" : "text-gray-400 group-hover:text-lime-400"
                 )} />
-                <span>{item.label}</span>
+                <span className={isHighlight && !isActive ? "text-lime-400" : ""}>{item.label}</span>
+                {isHighlight && (
+                  <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-medium">NEW</span>
+                )}
               </div>
             </Link>
           );

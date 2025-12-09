@@ -12,6 +12,7 @@ import Sandbox from "./pages/Sandbox";
 import Deploy from "./pages/Deploy";
 import ImageGen from "./pages/ImageGen";
 import Config from "./pages/Config";
+import Builder from "./pages/Builder";
 import NotFound from "./pages/not-found";
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
       <Layout onLogout={handleLogout}>
         <Switch>
           <Route path="/" component={Dashboard} />
+          <Route path="/builder" component={Builder} />
           <Route path="/editor" component={EditorPage} />
           <Route path="/chat" component={Chat} />
           <Route path="/docker" component={Docker} />

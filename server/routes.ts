@@ -61,7 +61,7 @@ interface MulterRequest extends Request {
 }
 
 // ========================================================
-// VIPU SYSTEM PROMPT - Empathetic AI Assistant
+// VIPU SYSTEM PROMPT - Empathetic AI Assistant (for Chat)
 // Named after Balaji's daughter Vipu - SHORT. SHARP. MEMORABLE.
 // ========================================================
 const VIPU_SYSTEM_PROMPT = `You are VipuDevAI - an empathetic, highly intelligent AI development assistant.
@@ -99,6 +99,106 @@ const VIPU_SYSTEM_PROMPT = `You are VipuDevAI - an empathetic, highly intelligen
 Remember: You're not just an AI - you're VipuDevAI, built with love by Balaji for developers worldwide. Make every interaction meaningful! 💚`;
 
 // ========================================================
+// VIPU APP BUILDER PROMPT - Generative Developer Agent
+// Generates complete full-stack applications with file structures
+// ========================================================
+const VIPU_BUILDER_PROMPT = `You are VipuDevAI App Builder - a GENERATIVE DEVELOPER AGENT that builds complete full-stack applications.
+
+🚀 YOUR MISSION:
+You DO NOT provide instructions or explanations. You GENERATE COMPLETE, RUNNABLE CODE for entire applications.
+When a user requests any system (school management, chat app, ERP, AI service, etc.), you IMMEDIATELY generate ALL necessary files.
+
+📁 OUTPUT FORMAT - MANDATORY:
+You MUST output files in this EXACT format. Each file MUST start with "FILE:" on its own line:
+
+FILE: package.json
+\`\`\`json
+{
+  "name": "project-name",
+  "version": "1.0.0",
+  ...
+}
+\`\`\`
+
+FILE: .env.example
+\`\`\`
+DATABASE_URL=postgresql://...
+SECRET_KEY=your-secret-key
+\`\`\`
+
+FILE: src/index.ts
+\`\`\`typescript
+import express from 'express';
+...
+\`\`\`
+
+🏗️ WHAT YOU GENERATE FOR EVERY PROJECT:
+
+1. **Project Configuration**
+   - package.json with all dependencies
+   - tsconfig.json / jsconfig.json
+   - .env.example with all required variables
+   - .gitignore
+
+2. **Backend (Node.js/Express or Python/FastAPI)**
+   - Entry point (index.ts/main.py)
+   - Routes/Controllers
+   - Database models/schema
+   - Middleware (auth, validation, error handling)
+   - API endpoints (RESTful)
+   - Database migrations
+
+3. **Frontend (React/Vue/Vanilla)**
+   - Main App component
+   - Pages/Views
+   - Components (reusable UI)
+   - Styles (CSS/Tailwind)
+   - API client/services
+   - State management
+
+4. **Database**
+   - Schema definitions (Drizzle/Prisma/SQLAlchemy)
+   - Seed data if needed
+   - Migration files
+
+5. **Deployment**
+   - Dockerfile (if needed)
+   - docker-compose.yml
+   - render.yaml / vercel.json / railway.toml
+   - README.md with setup instructions
+
+🎯 RULES:
+1. NEVER say "here's how to build..." - JUST BUILD IT
+2. NEVER ask clarifying questions - make smart assumptions
+3. ALWAYS generate production-ready, secure code
+4. ALWAYS include proper error handling
+5. ALWAYS use TypeScript when possible
+6. ALWAYS include comments in complex logic
+7. ALWAYS generate a complete folder structure
+8. ALWAYS include a README with:
+   - Project overview
+   - Tech stack
+   - Setup instructions (npm install, env setup)
+   - Running instructions
+   - API documentation
+
+💡 TECH STACK PREFERENCES:
+- Backend: Node.js + Express + TypeScript (default) or Python + FastAPI
+- Frontend: React + TypeScript + Tailwind CSS
+- Database: PostgreSQL with Drizzle ORM
+- Auth: JWT tokens or session-based
+- Validation: Zod for TypeScript, Pydantic for Python
+
+🎨 DESIGN:
+- Modern, clean UI with proper spacing
+- Responsive design (mobile-first)
+- Accessible (ARIA labels, semantic HTML)
+- Professional color schemes
+
+Remember: You are VipuDevAI - SHORT. SHARP. EXECUTE... 
+Generate the ENTIRE application. No shortcuts. No explanations. Just CODE.`;
+
+// ========================================================
 // MEMORY BUILDER - Contextual Conversation
 // ========================================================
 async function buildConversation(
@@ -134,11 +234,10 @@ Respond with empathy, precision, and your signature VipuDevAI excellence!`,
 }
 
 // ========================================================
-// REAL-TIME WEB SEARCH (Perplexity-style)
+// REAL-TIME WEB SEARCH (Basic)
 // ========================================================
 async function searchWeb(query: string): Promise<string> {
   try {
-    // Use DuckDuckGo Instant Answer API (no key required)
     const encoded = encodeURIComponent(query);
     const response = await fetch(
       `https://api.duckduckgo.com/?q=${encoded}&format=json&no_html=1&skip_disambig=1`
@@ -168,6 +267,169 @@ async function searchWeb(query: string): Promise<string> {
   } catch (err) {
     console.error("Web search error:", err);
     return "Search temporarily unavailable. Using AI knowledge.";
+  }
+}
+
+// ========================================================
+// PERPLEXITY-STYLE NLU & INTELLIGENT SEARCH MODULE
+// Natural Language Understanding with Query Rewriting,
+// Intent Detection, Reasoning, and Structured Responses
+// ========================================================
+interface SearchSource {
+  title: string;
+  snippet: string;
+  url?: string;
+}
+
+interface NLUResult {
+  originalQuery: string;
+  rewrittenQuery: string;
+  intent: string;
+  searchResults: SearchSource[];
+  synthesizedAnswer: string;
+  reasoning: string;
+  confidence: number;
+}
+
+const NLU_SYSTEM_PROMPT = `You are VipuDevAI's Intelligent Search Engine - a Perplexity-style AI that provides clear, well-researched answers.
+
+🧠 YOUR CAPABILITIES:
+1. **Intent Understanding**: Clearly understand what the user is really asking
+2. **Query Optimization**: Rewrite queries for maximum clarity and searchability
+3. **Information Synthesis**: Combine multiple sources into coherent answers
+4. **Clear Reasoning**: Show your thinking process transparently
+5. **Professional Formatting**: Structure responses for easy reading
+
+📋 RESPONSE FORMAT (JSON):
+You MUST respond with valid JSON in this exact format:
+{
+  "rewrittenQuery": "optimized search query",
+  "intent": "brief description of user intent (1 sentence)",
+  "reasoning": "step-by-step reasoning about the query (2-3 sentences)",
+  "answer": "comprehensive answer with clear paragraphs",
+  "keyPoints": ["point 1", "point 2", "point 3"],
+  "sources": ["source description 1", "source description 2"],
+  "confidence": 0.95,
+  "followUpQuestions": ["related question 1", "related question 2"]
+}
+
+🎯 GUIDELINES:
+- Be factual, accurate, and up-to-date
+- Cite sources when making specific claims
+- Use bullet points and headers for clarity
+- Provide balanced perspectives on controversial topics
+- Admit uncertainty rather than fabricate information
+- Keep answers comprehensive but concise
+- Include relevant context the user might not have asked for but would find valuable
+
+Remember: You're VipuDevAI - SHORT. SHARP. ACCURATE. 💚`;
+
+async function performIntelligentSearch(query: string): Promise<SearchSource[]> {
+  const sources: SearchSource[] = [];
+  
+  try {
+    // Search DuckDuckGo for instant answers
+    const encoded = encodeURIComponent(query);
+    const response = await fetch(
+      `https://api.duckduckgo.com/?q=${encoded}&format=json&no_html=1&skip_disambig=1`
+    );
+    const data = await response.json();
+
+    if (data.Abstract) {
+      sources.push({
+        title: data.Heading || "Encyclopedia",
+        snippet: data.Abstract,
+        url: data.AbstractURL
+      });
+    }
+
+    if (data.Answer) {
+      sources.push({
+        title: "Direct Answer",
+        snippet: data.Answer,
+      });
+    }
+
+    // Add related topics as sources
+    if (data.RelatedTopics?.length > 0) {
+      data.RelatedTopics.slice(0, 5).forEach((topic: any) => {
+        if (topic.Text) {
+          sources.push({
+            title: topic.FirstURL ? topic.FirstURL.split('/').pop()?.replace(/_/g, ' ') || "Related" : "Related Topic",
+            snippet: topic.Text,
+            url: topic.FirstURL
+          });
+        }
+      });
+    }
+
+    // Search Wikipedia for additional context
+    try {
+      const wikiResponse = await fetch(
+        `https://en.wikipedia.org/api/rest_v1/page/summary/${encoded}`
+      );
+      if (wikiResponse.ok) {
+        const wikiData = await wikiResponse.json();
+        if (wikiData.extract && !sources.some(s => s.snippet === wikiData.extract)) {
+          sources.push({
+            title: wikiData.title || "Wikipedia",
+            snippet: wikiData.extract,
+            url: wikiData.content_urls?.desktop?.page
+          });
+        }
+      }
+    } catch {}
+
+  } catch (err) {
+    console.error("Intelligent search error:", err);
+  }
+
+  return sources;
+}
+
+async function processNLUQuery(
+  query: string,
+  openai: OpenAI,
+  searchResults: SearchSource[]
+): Promise<any> {
+  try {
+    const searchContext = searchResults.length > 0
+      ? searchResults.map((s, i) => `[${i + 1}] ${s.title}: ${s.snippet}`).join("\n\n")
+      : "No external search results available.";
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: NLU_SYSTEM_PROMPT },
+        {
+          role: "user",
+          content: `User Query: "${query}"
+
+Search Results:
+${searchContext}
+
+Analyze this query and provide a comprehensive, well-structured answer in the JSON format specified.`
+        }
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+      response_format: { type: "json_object" }
+    });
+
+    const content = completion.choices[0]?.message?.content || "{}";
+    return JSON.parse(content);
+  } catch (err) {
+    console.error("NLU processing error:", err);
+    return {
+      rewrittenQuery: query,
+      intent: "General information request",
+      reasoning: "Processing the query directly.",
+      answer: "I encountered an issue processing your query. Please try again.",
+      keyPoints: [],
+      sources: [],
+      confidence: 0.5,
+      followUpQuestions: []
+    };
   }
 }
 
@@ -463,6 +725,60 @@ export async function registerRoutes(
   });
 
   // ======================================================
+  // INTELLIGENT SEARCH - Perplexity-style NLU Search 🔍
+  // ======================================================
+  app.post("/api/assistant/search", async (req, res) => {
+    const { query, apiKey } = req.body;
+
+    if (!query || query.trim().length === 0) {
+      return res.status(400).json({ error: "Query is required" });
+    }
+
+    const openai = getOpenAI(apiKey);
+    if (!openai) {
+      return res.status(400).json({
+        error: "OpenAI API key required",
+        hint: "Please add your OpenAI API key in the Chat page",
+      });
+    }
+
+    try {
+      // Step 1: Perform intelligent web search
+      const searchSources = await performIntelligentSearch(query);
+
+      // Step 2: Process with NLU
+      const nluResult = await processNLUQuery(query, openai, searchSources);
+
+      // Step 3: Format response
+      res.json({
+        success: true,
+        query: query,
+        rewrittenQuery: nluResult.rewrittenQuery || query,
+        intent: nluResult.intent || "Information request",
+        reasoning: nluResult.reasoning || "",
+        answer: nluResult.answer || "Unable to generate answer.",
+        keyPoints: nluResult.keyPoints || [],
+        sources: searchSources.map((s) => ({
+          title: s.title,
+          snippet: s.snippet.slice(0, 200),
+          url: s.url,
+        })),
+        aiSources: nluResult.sources || [],
+        confidence: nluResult.confidence || 0.8,
+        followUpQuestions: nluResult.followUpQuestions || [],
+        model: "gpt-4o",
+        searchTime: new Date().toISOString(),
+      });
+    } catch (error: any) {
+      console.error("Intelligent search error:", error);
+      res.status(500).json({
+        error: "Search temporarily unavailable",
+        details: error.message,
+      });
+    }
+  });
+
+  // ======================================================
   // CODE EXECUTION - Run JS/Python Code
   // ======================================================
   app.post("/api/run", async (req, res) => {
@@ -668,5 +984,167 @@ export async function registerRoutes(
     }
   });
 
+  // ======================================================
+  // APP BUILDER - Generative Developer Agent
+  // Builds complete full-stack applications
+  // ======================================================
+  app.post("/api/build", async (req, res) => {
+    const { prompt, techStack, apiKey } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Project description is required" });
+    }
+
+    const openai = getOpenAI(apiKey);
+    if (!openai) {
+      return res.status(400).json({
+        error: "OpenAI API key required",
+        hint: "Please add your OpenAI API key",
+      });
+    }
+
+    try {
+      const techStackInfo = techStack ? `\n\nUSER REQUESTED TECH STACK: ${techStack}` : "";
+      
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: VIPU_BUILDER_PROMPT + techStackInfo,
+          },
+          {
+            role: "user",
+            content: `Build me: ${prompt}\n\nGenerate ALL files for a complete, production-ready application. Start immediately with the file outputs.`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 16384, // Maximum output for complex apps
+      });
+
+      const rawResponse = completion.choices[0]?.message?.content || "";
+      
+      // Parse the response into files
+      const files = parseFilesFromResponse(rawResponse);
+
+      res.json({
+        rawResponse,
+        files,
+        fileCount: files.length,
+        model: "gpt-4o",
+        prompt,
+      });
+    } catch (error: any) {
+      console.error("Build error:", error);
+      res.status(500).json({
+        error: "Build failed",
+        details: error.message,
+      });
+    }
+  });
+
+  // ======================================================
+  // DOWNLOAD PROJECT - Create ZIP from generated files
+  // ======================================================
+  app.post("/api/download-project", (req, res) => {
+    const { files, projectName } = req.body;
+
+    if (!files || !Array.isArray(files) || files.length === 0) {
+      return res.status(400).json({ error: "Files are required" });
+    }
+
+    try {
+      const zip = new AdmZip();
+      const safeName = (projectName || "vipudev-project").replace(/[^\w\-]/g, "-");
+
+      for (const file of files) {
+        if (file.path && file.content) {
+          // Ensure proper path within ZIP (remove leading slashes)
+          const filePath = file.path.replace(/^\/+/, "");
+          zip.addFile(filePath, Buffer.from(file.content, "utf-8"));
+        }
+      }
+
+      const buffer = zip.toBuffer();
+
+      res.set({
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${safeName}.zip"`,
+      });
+
+      res.send(buffer);
+    } catch (error: any) {
+      console.error("Download error:", error);
+      res.status(500).json({ error: "Failed to create ZIP" });
+    }
+  });
+
   return httpServer;
+}
+
+// ========================================================
+// FILE PARSER - Extract files from AI response
+// ========================================================
+function parseFilesFromResponse(response: string): { path: string; content: string; language: string }[] {
+  const files: { path: string; content: string; language: string }[] = [];
+  
+  // Pattern to match: FILE: path\n```language\ncontent\n```
+  const filePattern = /FILE:\s*([^\n]+)\n```(\w*)\n([\s\S]*?)```/g;
+  
+  let match;
+  while ((match = filePattern.exec(response)) !== null) {
+    const filePath = match[1].trim();
+    const language = match[2] || detectLanguage(filePath);
+    const content = match[3].trim();
+    
+    if (filePath && content) {
+      files.push({
+        path: filePath,
+        content,
+        language,
+      });
+    }
+  }
+
+  // If no FILE: pattern found, try alternative patterns
+  if (files.length === 0) {
+    // Try: ### filename or ## filename followed by code block
+    const altPattern = /(?:#{2,3}|####)\s*`?([^`\n]+)`?\n```(\w*)\n([\s\S]*?)```/g;
+    while ((match = altPattern.exec(response)) !== null) {
+      const filePath = match[1].trim();
+      const language = match[2] || detectLanguage(filePath);
+      const content = match[3].trim();
+      
+      if (filePath && content && filePath.includes(".")) {
+        files.push({
+          path: filePath,
+          content,
+          language,
+        });
+      }
+    }
+  }
+
+  return files;
+}
+
+function detectLanguage(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  const langMap: Record<string, string> = {
+    ".ts": "typescript",
+    ".tsx": "tsx",
+    ".js": "javascript",
+    ".jsx": "jsx",
+    ".py": "python",
+    ".json": "json",
+    ".html": "html",
+    ".css": "css",
+    ".md": "markdown",
+    ".yml": "yaml",
+    ".yaml": "yaml",
+    ".sql": "sql",
+    ".env": "plaintext",
+    ".gitignore": "plaintext",
+  };
+  return langMap[ext] || "plaintext";
 }
