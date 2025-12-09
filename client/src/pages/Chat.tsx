@@ -428,31 +428,71 @@ export default function Chat() {
         </div>
       )}
 
-      {/* API Key Input */}
-      <div className={`rounded-xl p-4 flex items-center gap-3 ${apiKey ? "bg-lime-500/10 border border-lime-500/20" : "bg-amber-500/10 border border-amber-500/20"}`}>
-        <Key className={`w-5 h-5 flex-shrink-0 ${apiKey ? "text-lime-400" : "text-amber-400"}`} />
-        <div className="flex-1">
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="Enter your OpenAI API key to start chatting..."
-            className="w-full bg-transparent text-sm text-white placeholder:text-amber-400/60 focus:outline-none"
-            data-testid="input-api-key"
-          />
-          <p className={`text-xs mt-1 ${apiKey ? "text-lime-500/60" : "text-amber-500/60"}`}>
-            {apiKey ? "API key set - ready to chat!" : "Your key is stored locally and never shared"}
-          </p>
-        </div>
-        {apiKey && (
+      {/* API Key Input - Collapsible when saved */}
+      {!apiKey ? (
+        <div className="rounded-xl p-4 flex items-center gap-3 bg-amber-500/10 border border-amber-500/20">
+          <Key className="w-5 h-5 flex-shrink-0 text-amber-400" />
+          <div className="flex-1">
+            <input
+              type="password"
+              id="api-key-input"
+              placeholder="Enter your OpenAI API key to start chatting..."
+              className="w-full bg-transparent text-sm text-white placeholder:text-amber-400/60 focus:outline-none"
+              data-testid="input-api-key"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const input = e.target as HTMLInputElement;
+                  if (input.value.trim()) {
+                    setApiKey(input.value.trim());
+                    fetch("/api/config", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ apiKey: input.value.trim() }),
+                    }).then(() => toast.success("API key saved!"));
+                  }
+                }
+              }}
+            />
+            <p className="text-xs mt-1 text-amber-500/60">
+              Press Enter to save. Your key is stored securely.
+            </p>
+          </div>
           <button
-            onClick={() => setApiKey("")}
+            onClick={() => {
+              const input = document.getElementById("api-key-input") as HTMLInputElement;
+              if (input?.value.trim()) {
+                setApiKey(input.value.trim());
+                fetch("/api/config", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ apiKey: input.value.trim() }),
+                }).then(() => toast.success("API key saved!"));
+              }
+            }}
+            className="px-3 py-1.5 text-xs bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors"
+          >
+            Save
+          </button>
+        </div>
+      ) : (
+        <div className="rounded-xl p-3 flex items-center gap-3 bg-lime-500/10 border border-lime-500/20">
+          <Key className="w-4 h-4 text-lime-400" />
+          <span className="text-sm text-lime-400 flex-1">API key saved - ready to chat!</span>
+          <button
+            onClick={() => {
+              setApiKey("");
+              fetch("/api/config", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ apiKey: "" }),
+              }).then(() => toast.info("API key cleared"));
+            }}
             className="text-xs text-gray-400 hover:text-red-400 transition-colors"
           >
-            Clear
+            Change Key
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Perplexity-style Search Results */}
       {chatMode === "search" && (isSearching || searchResult) && (
