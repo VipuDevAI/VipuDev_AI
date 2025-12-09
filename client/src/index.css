@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+}
+
+/* VipuDev.AI Theme - Green/Lime Based */
+:root {
+  --background: 140 30% 6%;
+  --foreground: 210 40% 98%;
+  
+  --card: 140 30% 10%;
+  --card-foreground: 210 40% 98%;
+  
+  --popover: 140 30% 8%;
+  --popover-foreground: 210 40% 98%;
+  
+  --primary: 82 85% 50%;
+  --primary-foreground: 140 30% 6%;
+  
+  --secondary: 140 25% 15%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --muted: 140 25% 15%;
+  --muted-foreground: 215 20% 65%;
+  
+  --accent: 82 85% 50%;
+  --accent-foreground: 140 30% 6%;
+  
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --border: 140 25% 18%;
+  --input: 140 25% 12%;
+  --ring: 82 85% 50%;
+  
+  --radius: 0.5rem;
+
+  /* Sidebar vars */
+  --sidebar: 140 30% 5%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 82 85% 50%;
+  --sidebar-primary-foreground: 140 30% 6%;
+  --sidebar-accent: 140 25% 15%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 140 25% 12%;
+  --sidebar-ring: 82 85% 50%;
+}
+
+/* VipuDev.AI themed background - Green Based */
+body {
+  @apply bg-background text-foreground font-sans antialiased;
+  background-color: #0a1a0f;
+  background-image: 
+    radial-gradient(ellipse at 75% 15%, rgba(132, 204, 22, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 25% 85%, rgba(34, 197, 94, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(180, 255, 50, 0.05) 0%, transparent 60%),
+    url('/vipudev-logo.png');
+  background-size: cover, cover, cover, 320px;
+  background-position: center, center, center, bottom 40px right 40px;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Glassmorphism with green theme */
+.glass-card {
+  background: rgba(10, 26, 15, 0.90);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(132, 204, 22, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover {
+  border-color: rgba(132, 204, 22, 0.35);
+}
+
+.sidebar-btn {
+  @apply flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200 font-medium text-sm;
+}
+
+.sidebar-btn.active {
+  @apply text-white shadow-lg;
+  background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* VipuDev gradient text - Green */
+.vipu-gradient {
+  background: linear-gradient(135deg, #22c55e 0%, #84cc16 50%, #a3e635 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar styling - Green */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(132, 204, 22, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(132, 204, 22, 0.5);
+}
+
+/* Accent glow effects - Green */
+.accent-glow {
+  box-shadow: 0 0 25px rgba(132, 204, 22, 0.4);
+}
+
+/* Button gradients - Green */
+.btn-vipu {
+  background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+  transition: all 0.3s ease;
+}
+
+.btn-vipu:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #a3e635 100%);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* Input focus states - Green */
+input:focus, textarea:focus, select:focus {
+  border-color: rgba(132, 204, 22, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(132, 204, 22, 0.1);
+}
