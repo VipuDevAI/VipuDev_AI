@@ -234,6 +234,40 @@ Respond with empathy, precision, and your signature VipuDevAI excellence!`,
 }
 
 // ========================================================
+// WEATHER API (Free - wttr.in)
+// ========================================================
+async function getWeather(city: string): Promise<string> {
+  try {
+    const encoded = encodeURIComponent(city);
+    const response = await fetch(`https://wttr.in/${encoded}?format=j1`);
+    if (!response.ok) return "";
+    
+    const data = await response.json();
+    const current = data.current_condition?.[0];
+    const location = data.nearest_area?.[0];
+    
+    if (!current) return "";
+    
+    const cityName = location?.areaName?.[0]?.value || city;
+    const country = location?.country?.[0]?.value || "";
+    const temp = current.temp_C;
+    const feelsLike = current.FeelsLikeC;
+    const humidity = current.humidity;
+    const desc = current.weatherDesc?.[0]?.value || "";
+    const wind = current.windspeedKmph;
+    
+    return `🌤️ Weather in ${cityName}${country ? `, ${country}` : ""}:
+Temperature: ${temp}°C (Feels like ${feelsLike}°C)
+Condition: ${desc}
+Humidity: ${humidity}%
+Wind: ${wind} km/h`;
+  } catch (err) {
+    console.error("Weather error:", err);
+    return "";
+  }
+}
+
+// ========================================================
 // REAL-TIME WEB SEARCH (Basic)
 // ========================================================
 async function searchWeb(query: string): Promise<string> {
@@ -639,12 +673,39 @@ export async function registerRoutes(
     if (!openai) {
       return res.status(400).json({
         error: "OpenAI API key required",
-        hint: "Please add your OpenAI API key in Config or DALL·E page",
+        hint: "Please add your OpenAI API key in the Chat page",
       });
     }
 
     try {
       let searchResults = "";
+      
+      // Get current time in multiple timezones for real-time awareness
+      const now = new Date();
+      const realTimeData = {
+        utc: now.toISOString(),
+        ist: now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "full", timeStyle: "long" }),
+        london: now.toLocaleString("en-GB", { timeZone: "Europe/London", dateStyle: "full", timeStyle: "long" }),
+        newYork: now.toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "full", timeStyle: "long" }),
+        tokyo: now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", dateStyle: "full", timeStyle: "long" }),
+        sydney: now.toLocaleString("en-AU", { timeZone: "Australia/Sydney", dateStyle: "full", timeStyle: "long" }),
+        dubai: now.toLocaleString("en-AE", { timeZone: "Asia/Dubai", dateStyle: "full", timeStyle: "long" }),
+        singapore: now.toLocaleString("en-SG", { timeZone: "Asia/Singapore", dateStyle: "full", timeStyle: "long" }),
+      };
+
+      // Check for weather queries and fetch real-time weather
+      let weatherData = "";
+      if (messages?.length > 0) {
+        const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
+        const weatherMatch = lastMessage.match(/weather\s+(?:in\s+)?([a-zA-Z\s]+)/i) ||
+                            lastMessage.match(/(?:how(?:'s| is) (?:the )?weather|what(?:'s| is) (?:the )?weather)\s+(?:in\s+)?([a-zA-Z\s]+)/i) ||
+                            lastMessage.match(/([a-zA-Z\s]+)\s+weather/i);
+        
+        if (weatherMatch || lastMessage.includes("weather")) {
+          const city = weatherMatch?.[1]?.trim() || "Chennai"; // Default to Chennai if no city specified
+          weatherData = await getWeather(city);
+        }
+      }
 
       // Real-time search if enabled and query looks like a question
       if (searchEnabled && messages?.length > 0) {
@@ -672,6 +733,28 @@ export async function registerRoutes(
         codeContext,
         projectId
       );
+
+      // Add real-time data (current time in multiple timezones + weather if requested)
+      let realTimeContent = `⏰ REAL-TIME DATA (Use this to answer time/date questions accurately):
+Current UTC: ${realTimeData.utc}
+India (IST): ${realTimeData.ist}
+London (GMT/BST): ${realTimeData.london}
+New York (EST/EDT): ${realTimeData.newYork}
+Tokyo (JST): ${realTimeData.tokyo}
+Sydney (AEST): ${realTimeData.sydney}
+Dubai (GST): ${realTimeData.dubai}
+Singapore (SGT): ${realTimeData.singapore}
+
+You have access to real-time data. Always use this information when users ask about current time, date, or day.`;
+
+      if (weatherData) {
+        realTimeContent += `\n\n${weatherData}\n\nUse this weather information to answer the user's question about weather.`;
+      }
+
+      conversation.push({
+        role: "system",
+        content: realTimeContent,
+      });
 
       // Add search results if available
       if (searchResults) {

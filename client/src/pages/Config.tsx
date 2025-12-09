@@ -71,16 +71,17 @@ export default function Config() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-              <Key className="w-4 h-4" /> API Key
+              <Key className="w-4 h-4" /> OpenAI API Key
             </label>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-vipu-xxxxxxxxxxxx"
-              className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-indigo-500/50 transition-colors font-mono text-sm"
-              data-testid="input-api-key"
-            />
+            <div className="rounded-xl p-3 flex items-center gap-3 bg-lime-500/10 border border-lime-500/20">
+              <span className="text-sm text-gray-400 flex-1">API key is managed in the Chat page for security.</span>
+              <a
+                href="/chat"
+                className="px-3 py-1.5 text-xs bg-lime-500/20 text-lime-400 rounded-lg hover:bg-lime-500/30 transition-colors"
+              >
+                Go to Chat
+              </a>
+            </div>
           </div>
 
           <div className="pt-4">

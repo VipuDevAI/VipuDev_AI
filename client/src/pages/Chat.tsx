@@ -122,18 +122,13 @@ export default function Chat() {
     }
   }, [isListening]);
 
-  // Load saved API key from config
-  useQuery({
-    queryKey: ["config"],
-    queryFn: async () => {
-      const res = await fetch("/api/config");
-      const data = await res.json();
-      if (data.config?.apiKey) {
-        setApiKey(data.config.apiKey);
-      }
-      return data;
-    },
-  });
+  // Load saved API key from localStorage
+  useEffect(() => {
+    const savedKey = localStorage.getItem("vipudev_api_key");
+    if (savedKey) {
+      setApiKey(savedKey);
+    }
+  }, []);
 
   // Load chat history
   const { data: historyData } = useQuery({
@@ -428,17 +423,62 @@ export default function Chat() {
         </div>
       )}
 
-      {/* API Key Status - Only shows warning if not set */}
-      {!apiKey && (
-        <div className="rounded-xl p-3 flex items-center gap-3 bg-amber-500/10 border border-amber-500/20">
-          <Key className="w-4 h-4 text-amber-400" />
-          <span className="text-sm text-amber-400 flex-1">OpenAI API key required. Set it in the Config page.</span>
-          <a
-            href="/config"
+      {/* API Key Input - Only place to enter API key */}
+      {!apiKey ? (
+        <div className="rounded-xl p-4 flex items-center gap-3 bg-amber-500/10 border border-amber-500/20">
+          <Key className="w-5 h-5 flex-shrink-0 text-amber-400" />
+          <div className="flex-1">
+            <input
+              type="password"
+              id="api-key-input"
+              placeholder="Enter your OpenAI API key (sk-...)"
+              className="w-full bg-transparent text-sm text-white placeholder:text-amber-400/60 focus:outline-none"
+              data-testid="input-api-key"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const input = e.target as HTMLInputElement;
+                  if (input.value.trim()) {
+                    const key = input.value.trim();
+                    setApiKey(key);
+                    localStorage.setItem("vipudev_api_key", key);
+                    toast.success("API key saved!");
+                  }
+                }
+              }}
+            />
+            <p className="text-xs mt-1 text-amber-500/60">
+              Press Enter or click Save. Your key is stored in browser.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              const input = document.getElementById("api-key-input") as HTMLInputElement;
+              if (input?.value.trim()) {
+                const key = input.value.trim();
+                setApiKey(key);
+                localStorage.setItem("vipudev_api_key", key);
+                toast.success("API key saved!");
+              }
+            }}
             className="px-3 py-1.5 text-xs bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors"
           >
-            Go to Config
-          </a>
+            Save
+          </button>
+        </div>
+      ) : (
+        <div className="rounded-xl p-3 flex items-center gap-3 bg-lime-500/10 border border-lime-500/20">
+          <Key className="w-4 h-4 text-lime-400" />
+          <span className="text-sm text-lime-400 flex-1">API key saved - ready to use!</span>
+          <button
+            onClick={() => {
+              setApiKey("");
+              localStorage.removeItem("vipudev_api_key");
+              toast.info("API key cleared");
+            }}
+            className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+          >
+            Change Key
+          </button>
         </div>
       )}
 

@@ -1,7 +1,6 @@
 import { Palette, Sparkles, Image as ImageIcon, Key, Loader2, ExternalLink, Download, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 
 export default function ImageGen() {
   const [openaiKey, setOpenaiKey] = useState("");
@@ -10,18 +9,13 @@ export default function ImageGen() {
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
-  // Load saved API key from config
-  useQuery({
-    queryKey: ["config"],
-    queryFn: async () => {
-      const res = await fetch("/api/config");
-      const data = await res.json();
-      if (data.config?.apiKey && !openaiKey) {
-        setOpenaiKey(data.config.apiKey);
-      }
-      return data;
-    },
-  });
+  // Load saved API key from localStorage (set in Chat page)
+  useEffect(() => {
+    const savedKey = localStorage.getItem("vipudev_api_key");
+    if (savedKey) {
+      setOpenaiKey(savedKey);
+    }
+  }, []);
 
   const handleGenerate = async () => {
     if (!openaiKey) {
@@ -121,16 +115,16 @@ export default function ImageGen() {
       </div>
 
       <div className="space-y-4 mb-6">
-        {/* API Key Status - Only shows warning if not set */}
+        {/* API Key Status - Shows warning if not set, links to Chat */}
         {!openaiKey && (
           <div className="rounded-xl p-3 flex items-center gap-3 bg-amber-500/10 border border-amber-500/20">
             <Key className="w-4 h-4 text-amber-400" />
-            <span className="text-sm text-amber-400 flex-1">OpenAI API key required. Set it in the Config page.</span>
+            <span className="text-sm text-amber-400 flex-1">OpenAI API key required. Set it in the Chat page.</span>
             <a
-              href="/config"
+              href="/chat"
               className="px-3 py-1.5 text-xs bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors"
             >
-              Go to Config
+              Go to Chat
             </a>
           </div>
         )}
