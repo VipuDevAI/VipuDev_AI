@@ -121,18 +121,19 @@ export default function ImageGen() {
       </div>
 
       <div className="space-y-4 mb-6">
-        {/* API Key Input */}
-        <div className="relative">
-          <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-          <input
-            type="password"
-            value={openaiKey}
-            onChange={(e) => setOpenaiKey(e.target.value)}
-            placeholder="OpenAI API Key (sk-...)"
-            className="w-full bg-black/30 border border-pink-500/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-pink-400/50 transition-colors font-mono text-sm"
-            data-testid="input-openai-key"
-          />
-        </div>
+        {/* API Key Status - Only shows warning if not set */}
+        {!openaiKey && (
+          <div className="rounded-xl p-3 flex items-center gap-3 bg-amber-500/10 border border-amber-500/20">
+            <Key className="w-4 h-4 text-amber-400" />
+            <span className="text-sm text-amber-400 flex-1">OpenAI API key required. Set it in the Config page.</span>
+            <a
+              href="/config"
+              className="px-3 py-1.5 text-xs bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors"
+            >
+              Go to Config
+            </a>
+          </div>
+        )}
 
         {/* Prompt & Generate */}
         <div className="flex gap-3">
